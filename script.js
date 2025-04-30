@@ -12,7 +12,7 @@ const globalWrapper = (() => {
 
             [0, 4, 8], [2, 4, 6] //diagonal
         ];
-
+        //Obj that hold information of player chosen cells inside of an arrays
         const playerMoves = {
             player1: [],
             player2: []
@@ -22,9 +22,13 @@ const globalWrapper = (() => {
         function makeMove(index, symbol) {
             gameBoard[index] = symbol;
         };
+        //TODO: create a function which will push user move to playerMoves obj
+        function pushPlayerMoves() {
+
+        }
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
-        function checkForWinningCombination(player, winCells) {
-            return winCells.some((cells) => cells.every((cell ) => player.includes(cell)));
+        function checkForWinningCombination(player) {
+            return WINNABLE_CELLS.some((cells) => cells.every((cell ) => player.includes(cell)));
         }
         //Function that resets board to initial state
         function resetBoard(board) {
@@ -40,11 +44,19 @@ const globalWrapper = (() => {
         let isPlayerOneMove = true;
         let isGameOver = false;
         let moveCount = 0;
+
+        const player1Symbol = 'X';
+        const player2Symbol = 'O';
+
+
     }
-    return {GameFlow};
+    return {GameFlow, GameLogic};
 })();
 
 const gameFlow = globalWrapper.GameFlow();
+const gameLogic = globalWrapper.GameLogic();
+
+
 
 
 
