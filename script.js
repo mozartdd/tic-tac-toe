@@ -1,4 +1,4 @@
-(() => {
+const globalWrapper = (() => {
     function GameFlow() {
         //Board to hold cells/fields selected by user's
         const gameBoard = Array(9).fill('');
@@ -26,17 +26,27 @@
         function checkForWinningCombination(player, winCells) {
             return winCells.some((cells) => cells.every((cell ) => player.includes(cell)));
         }
+        //Function that resets board to initial state
+        function resetBoard(board) {
+            for(let i = 0; i < board.length; i++) {
+                board[i] = '';
+            }
+        }
 
-
-
-        return {makeMove, checkForWinningCombination};
+        return {makeMove, checkForWinningCombination, resetBoard};
     }
 
     function GameLogic() {
-            
+        let isPlayerOneMove = true;
+        let isGameOver = false;
+        let moveCount = 0;
     }
     return {GameFlow};
 })();
+
+const gameFlow = globalWrapper.GameFlow();
+
+
 
 
 
