@@ -22,10 +22,6 @@ const globalWrapper = (() => {
         function makeMove(index, symbol) {
             gameBoard[index] = symbol;
         };
-        //TODO: create a function which will push user move to playerMoves obj
-        function pushPlayerMoves() {
-
-        }
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
         function checkForWinningCombination(player) {
             return WINNABLE_CELLS.some((cells) => cells.every((cell ) => player.includes(cell)));
@@ -48,6 +44,15 @@ const globalWrapper = (() => {
         const player1Symbol = 'X';
         const player2Symbol = 'O';
 
+        //TODO: create a function which will push user move to playerMoves obj
+        function pushPlayerMoves(player, move) {
+            playerMoves[player].push(move);
+        }
+
+
+    }
+    //TODO: create design and ui before start working on logic
+    function DomManipulations() {
 
     }
     return {GameFlow, GameLogic};
@@ -55,16 +60,3 @@ const globalWrapper = (() => {
 
 const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
-
-
-
-
-
-
-
-
-
-
-
-
-
