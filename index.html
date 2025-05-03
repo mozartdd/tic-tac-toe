@@ -7,26 +7,29 @@
         <title>TIC TAC TOE</title>
     </head>
     <body>
-        <div class="container" data-class="board-container">
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
-            <div class="cell" data-class="game-square"></div>
+        <div class="high-container" data-class="high-container">
+            <div class="container" data-class="container">
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+                <div class="cell" data-class="cell"></div>
+            </div>
+            <button class="restart-btn" data-class="restart-btn">Restart Board</button>
         </div>
-        <button class="restart-btn" data-class="restart-btn">Restart Game</button>
 
-        <div class="player-input-fields" data-class="input-div">
+        <div class="player-input-fields" data-class="player-input-fields">
             <label for="player-one">Player One</label>
-            <input type="text">
-            <label for="player-one">Player Two</label>
-            <input type="text">
-            <script src="script.js"></script>
-            <button>Start Game</button>
+            <input type="text" id="player-one">
+            <label for="player-two">Player Two</label>
+            <input type="text"  id="player-two">
+            <button class="start-btn" data-class="start-btn">Start Game</button>
         </div>
+
+        <script src="script.js"></script>
     </body>
 </html>

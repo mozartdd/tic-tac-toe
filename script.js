@@ -76,16 +76,29 @@ const globalWrapper = (() => {
             isGameOver = false;
             moveCount = 0;
             gameFlow.resetPlayerMoves()
+            gameFlow.resetBoard();
         };
         
         return {pushSymbol, declareDraw, restartGame};
     }
-    //TODO: create design and ui before start working on logic
-    function DomManipulations() {
+    
+    function GameControls() {
+        const startBtn = document.querySelector('[data-class="start-btn"]');
+        const gameBoard = document.querySelector('[data-class="high-container"]');
+        
+        const resetBtn = document.querySelector('[data-class="restart-btn"]')
+            .addEventListener('click', gameLogic.restartGame);
+            
+        startBtn.addEventListener('click', () => {
+            startBtn.closest('.player-input-fields').style.display = 'none';
+            gameBoard.style.display = 'grid';
+        })
 
+        return { };
     }
-    return {GameFlow, GameLogic};
+    return {GameFlow, GameLogic, GameControls};
 })();
 
 const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
+const gameControls = globalWrapper.GameControls();

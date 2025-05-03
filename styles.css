@@ -8,10 +8,12 @@ body {
     justify-content: center;
     flex-direction: column;
 }
-
+.high-container {
+    display: none;
+}
 /* Game board selectors */
 .container {
-    display: none;/*grid*/
+    display: grid;/*grid*/
     width: 500px;
     height: 500px;
     grid-template-columns: 1fr 1fr 1fr;
@@ -51,9 +53,8 @@ body {
 }
 
 .restart-btn {
-    display: none; /*inline-block*/
     font-size: 2rem;
-    margin-top: 1rem;
+    margin-top: 3rem;
     background-color: white;
     border: none;
     font-weight: bold;
@@ -81,6 +82,10 @@ label {
     font-size: 1.5rem;
     text-align: center;
     margin-top: 15px;
+}
+
+.red {
+    background-color: red;
 }
 
 
