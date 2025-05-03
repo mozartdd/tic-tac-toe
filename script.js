@@ -16,6 +16,10 @@ const globalWrapper = (() => {
             player2: []
         };
 
+        const getPlayer = (playerStatus) => {
+            return playerStatus ? playerMoves.player1 : playerMoves.player2 ;
+        }
+
         const resetPlayerMoves = () => {
             playerMoves.player1 = [];
             playerMoves.player2 = [];
@@ -29,6 +33,7 @@ const globalWrapper = (() => {
         //Function to add user checked symbol to game board
         const makeMove = (index, symbol) => {
             gameBoard[index] = symbol;
+            console.log(gameBoard);
         };
     
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
@@ -43,7 +48,7 @@ const globalWrapper = (() => {
             }
         };
     
-        return { makeMove, checkForWinningCombination, resetBoard, pushPlayerMoves, resetPlayerMoves };
+        return { getPlayer, makeMove, checkForWinningCombination, resetBoard, pushPlayerMoves, resetPlayerMoves };
     }
     
 
@@ -62,6 +67,7 @@ const globalWrapper = (() => {
                 gameFlow.makeMove(move, currentSymbol);
                 isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
                 moveCount++;
+                console.log(moveCount);
             }
         };
 
@@ -79,16 +85,30 @@ const globalWrapper = (() => {
             gameFlow.resetBoard();
         };
         
-        return {pushSymbol, declareDraw, restartGame};
+        const handleMove = (move) => {
+            const playerStatus = gameFlow.getPlayer(isPlayerOneMove)
+            pushSymbol(move);
+            declareDraw();
+            gameFlow.checkForWinningCombination(playerStatus);
+        }
+        
+        return { handleMove, restartGame};
     }
     
     function GameControls() {
         const startBtn = document.querySelector('[data-class="start-btn"]');
         const gameBoard = document.querySelector('[data-class="high-container"]');
+        const cells = document.querySelectorAll('[data-class="cell"]');
+
+        cells.forEach((cell) => {
+            cell.addEventListener('click', () => {
+                gameLogic.handleMove(cell.getAttribute('data-value'));
+            })
+        });
         
         const resetBtn = document.querySelector('[data-class="restart-btn"]')
             .addEventListener('click', gameLogic.restartGame);
-            
+
         startBtn.addEventListener('click', () => {
             startBtn.closest('.player-input-fields').style.display = 'none';
             gameBoard.style.display = 'grid';
@@ -102,3 +122,6 @@ const globalWrapper = (() => {
 const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
 const gameControls = globalWrapper.GameControls();
+
+
+//TODO: attach each cell with value which will added to pushSymbol function call;
