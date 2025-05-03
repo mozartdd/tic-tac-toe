@@ -15,11 +15,20 @@ const globalWrapper = (() => {
             player1: [],
             player2: []
         };
+
+        const resetPlayerMoves = () => {
+            playerMoves.player1 = [];
+            playerMoves.player2 = [];
+        };
+
+        //Function which will push user move to playerMoves obj
+        const pushPlayerMoves = (player, move) => {
+            playerMoves[player].push(move);
+        };
     
         //Function to add user checked symbol to game board
         const makeMove = (index, symbol) => {
             gameBoard[index] = symbol;
-            console.log(gameBoard);
         };
     
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
@@ -28,24 +37,19 @@ const globalWrapper = (() => {
         };
     
         //Function that resets board to initial state
-        const resetBoard = (board) => {
-            for (let i = 0; i < board.length; i++) {
-                board[i] = '';
+        const resetBoard = () => {
+            for (let i = 0; i < gameBoard.length; i++) {
+                gameBoard[i] = '';
             }
         };
     
-        //Function which will push user move to playerMoves obj
-        const pushPlayerMoves = (player, move) => {
-            playerMoves[player].push(move);
-        };
-    
-        return { makeMove, checkForWinningCombination, resetBoard, pushPlayerMoves };
+        return { makeMove, checkForWinningCombination, resetBoard, pushPlayerMoves, resetPlayerMoves };
     }
     
 
     function GameLogic() {
         let isPlayerOneMove = true;
-        let isGameOver = true;
+        let isGameOver = false;
         let moveCount = 0;
 
         const player1Symbol = 'X';
@@ -53,15 +57,28 @@ const globalWrapper = (() => {
 
         //Function that adds player symbol to gameBoard obj based on player move
         const pushSymbol = (move) => {
-            const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
-            gameFlow.makeMove(move, currentSymbol);
-            isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
+            if (!isGameOver) {
+                const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
+                gameFlow.makeMove(move, currentSymbol);
+                isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
+                moveCount++;
+            }
         };
 
         //Function to stop game if it is draw
+        const declareDraw = () => {
+            if (moveCount === 9) {
+                isGameOver = true;
+            }
+        };
 
+        const restartGame = () => {
+            isGameOver = false;
+            moveCount = 0;
+            gameFlow.resetPlayerMoves()
+        };
         
-        return {pushSymbol};
+        return {pushSymbol, declareDraw, restartGame};
     }
     //TODO: create design and ui before start working on logic
     function DomManipulations() {
@@ -72,7 +89,3 @@ const globalWrapper = (() => {
 
 const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
-
-gameLogic.pushSymbol(0);
-gameLogic.pushSymbol(1);
-gameLogic.pushSymbol(2);
