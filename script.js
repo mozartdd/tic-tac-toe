@@ -16,10 +16,6 @@ const globalWrapper = (() => {
             player2: []
         };
 
-        const getPlayer = (playerStatus) => {
-            return playerStatus ? playerMoves.player1 : playerMoves.player2 ;
-        }
-
         const resetPlayerMoves = () => {
             playerMoves.player1 = [];
             playerMoves.player2 = [];
@@ -36,11 +32,6 @@ const globalWrapper = (() => {
             console.log(gameBoard);
         };
     
-        //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
-        const checkForWinningCombination = (player) => {
-            return WINNABLE_CELLS.some((cells) => cells.every((cell) => player.includes(cell)));
-        };
-    
         //Function that resets board to initial state
         const resetBoard = () => {
             for (let i = 0; i < gameBoard.length; i++) {
@@ -48,10 +39,9 @@ const globalWrapper = (() => {
             }
         };
     
-        return { getPlayer, makeMove, checkForWinningCombination, resetBoard, pushPlayerMoves, resetPlayerMoves };
+        return { WINNABLE_CELLS, makeMove, resetBoard, pushPlayerMoves, resetPlayerMoves };
     }
     
-
     function GameLogic() {
         let isPlayerOneMove = true;
         let isGameOver = false;
@@ -84,12 +74,16 @@ const globalWrapper = (() => {
             gameFlow.resetPlayerMoves()
             gameFlow.resetBoard();
         };
+        //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
+        const checkForWinningCombination = (array, player) => {
+            return array.some((cells) => cells.every((cell) => player.includes(cell)));
+        };
         
         const handleMove = (move) => {
-            const playerStatus = gameFlow.getPlayer(isPlayerOneMove)
+            const playerStatus = gameFlow.getPlayer(gameFlow.WINNABLE_CELLS ,isPlayerOneMove)
             pushSymbol(move);
             declareDraw();
-            gameFlow.checkForWinningCombination(playerStatus);
+            checkForWinningCombination(playerStatus);
         }
         
         return { handleMove, restartGame};
@@ -100,6 +94,7 @@ const globalWrapper = (() => {
         const gameBoard = document.querySelector('[data-class="high-container"]');
         const cells = document.querySelectorAll('[data-class="cell"]');
 
+        //Makes action after cell on board is pressed
         cells.forEach((cell) => {
             cell.addEventListener('click', () => {
                 gameLogic.handleMove(cell.getAttribute('data-value'));
@@ -123,5 +118,3 @@ const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
 const gameControls = globalWrapper.GameControls();
 
-
-//TODO: attach each cell with value which will added to pushSymbol function call;
