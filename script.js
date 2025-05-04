@@ -84,7 +84,6 @@ const globalWrapper = (() => {
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
         const checkForWinningCombination = (array, player) => {
             const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
-            const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
             console.log(gameFlow.getPlayerMoves());
             if (winner) {
                 console.log(isPlayerOneMove ? `${gameControls.playerTwo.value} has won the game` : `${gameControls.playerOne.value} has won the game`);
@@ -101,10 +100,7 @@ const globalWrapper = (() => {
             declareDraw();          
         };
 
-        const getPlayerSymbol = () => {
-            const currentSymbol = isPlayerOneMove ? player2Symbol : player1Symbol;
-            return currentSymbol;
-        }
+        const getPlayerSymbol = () => isPlayerOneMove ? player1Symbol : player2Symbol;
         const getGameStatus = () => isGameOver;
         
         return { handleMove, restartGame, getPlayerSymbol, getGameStatus, makeMove};
@@ -120,11 +116,6 @@ const globalWrapper = (() => {
         const playerTwo = document.querySelector('[data-class="player-two"]');
 
         //TODO: FIX BUG THAT STOPS GAME BEFORE I INPUT LAST ELEMENT IN CELL
-        const clearCells = () => {
-            cells.forEach((cell) => {
-                cell.innerHTML = ``;
-            })
-        }
 
         const playGame = () => {
             //Makes action after cell on board is pressed
@@ -136,7 +127,11 @@ const globalWrapper = (() => {
                         gamePiece.innerHTML = `<span>${gameLogic.getPlayerSymbol()}</span>`;
                         cell.appendChild(gamePiece);
                         }
+                    
                     })
+                cell.addEventListener('mouseover', () => {
+                    console.log(gameLogic.getPlayerSymbol());
+                })
                 })
             };
         
@@ -148,12 +143,17 @@ const globalWrapper = (() => {
                 clearCells();
             })
         };
+        const clearCells = () => {
+            cells.forEach((cell) => {
+                cell.innerHTML = ``;
+            })
+        }
 
         //starts game, adds user input name's to game screen
         const startGame = () => {
             startBtn.addEventListener('click', () => {
     
-            if (playerOne.value !== '' || playerTwo.value !== '') {
+            if (playerOne.value !== '' && playerTwo.value !== '') {
                 startBtn.closest('.player-input-fields').style.display = 'none';
                 gameBoard.style.display = 'flex';
                 displayNames(`Player 1: ${playerOne.value} (X)`);
