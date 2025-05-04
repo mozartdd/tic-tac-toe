@@ -21,15 +21,12 @@ const globalWrapper = (() => {
             playerMoves.player2 = [];
         };
 
-        //Function which will push user move to playerMoves obj
-        const pushPlayerMoves = (player, move) => {
-            playerMoves[player].push(move);
-        };
-    
         //Function to add user checked symbol to game board
         const makeMove = (index, symbol) => {
-            gameBoard[index] = symbol;
-            console.log(gameBoard);
+            if(gameBoard[index] === '') {
+                gameBoard[index] = symbol;
+                console.log(gameBoard);
+            }
         };
     
         //Function that resets board to initial state
@@ -39,9 +36,11 @@ const globalWrapper = (() => {
             }
         };
     
-        return { WINNABLE_CELLS, makeMove, resetBoard, pushPlayerMoves, resetPlayerMoves };
+        return { WINNABLE_CELLS, playerMoves, makeMove, resetBoard, resetPlayerMoves };
     }
     
+    //TODO:1) fix bug that after game is over engine is showing that game is won by opposite from winner player
+    //TODO:2) fix bug that i can push same values to player move obj
     function GameLogic() {
         let isPlayerOneMove = true;
         let isGameOver = false;
@@ -60,15 +59,25 @@ const globalWrapper = (() => {
                 console.log(moveCount);
             }
         };
+        //Function which will push user move to playerMoves obj
+        const pushPlayerMoves = (move) => {
+            const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
+            if(!isGameOver) {
+                currentPlayer.push(move);      
+            }
+        };
+        
 
         //Function to stop game if it is draw
         const declareDraw = () => {
             if (moveCount === 9) {
                 isGameOver = true;
+                console.log('Game has ended with draw!');
             }
         };
 
         const restartGame = () => {
+            isPlayerOneMove = true;
             isGameOver = false;
             moveCount = 0;
             gameFlow.resetPlayerMoves()
@@ -76,14 +85,25 @@ const globalWrapper = (() => {
         };
         //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
         const checkForWinningCombination = (array, player) => {
-            return array.some((cells) => cells.every((cell) => player.includes(cell)));
+            const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
+            const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
+            console.log(gameFlow.playerMoves);
+            if (winner) {
+                console.log(`${currentSymbol} won the game`);
+                isGameOver = true;
+            }
         };
+        //Declares winner
+        const declareWin = () => {
+
+        }
         
         const handleMove = (move) => {
-            const playerStatus = gameFlow.getPlayer(gameFlow.WINNABLE_CELLS ,isPlayerOneMove)
+            const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
+            pushPlayerMoves(move);
             pushSymbol(move);
             declareDraw();
-            checkForWinningCombination(playerStatus);
+            checkForWinningCombination(gameFlow.WINNABLE_CELLS, currentPlayer);            
         }
         
         return { handleMove, restartGame};
@@ -97,9 +117,9 @@ const globalWrapper = (() => {
         //Makes action after cell on board is pressed
         cells.forEach((cell) => {
             cell.addEventListener('click', () => {
-                gameLogic.handleMove(cell.getAttribute('data-value'));
+                gameLogic.handleMove(+cell.getAttribute('data-value'));
             })
-        });
+        }); 
         
         const resetBtn = document.querySelector('[data-class="restart-btn"]')
             .addEventListener('click', gameLogic.restartGame);
