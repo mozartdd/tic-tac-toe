@@ -2,28 +2,26 @@ const globalWrapper = (() => {
     function GameFlow() {
         //Board to hold cells/fields selected by user's
         const gameBoard = Array(9).fill('');
+        const getBoard = () => gameBoard; 
     
         const WINNABLE_CELLS = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], //rows
             [0, 3, 6], [1, 4, 7], [2, 5, 8], //columns
             [0, 4, 8], [2, 4, 6] //diagonal
         ];
+        const getWinCells = () => WINNABLE_CELLS;
+
         //Obj that hold information of player chosen cells inside of an arrays
         const playerMoves = {
             player1: [],
             player2: []
         };
+        const getPlayerMoves = () => playerMoves;
 
+        //resets player moves array's
         const resetPlayerMoves = () => {
             playerMoves.player1 = [];
             playerMoves.player2 = [];
-        };
-
-        //Function to add user checked symbol to game board
-        const makeMove = (index, symbol) => {
-            if(gameBoard[index] === '') {
-                gameBoard[index] = symbol;
-            }
         };
     
         //Function that resets board to initial state
@@ -33,7 +31,7 @@ const globalWrapper = (() => {
             }
         };
     
-        return { gameBoard, WINNABLE_CELLS, playerMoves, gameBoard, makeMove, resetBoard, resetPlayerMoves };
+        return { getBoard, getWinCells, getPlayerMoves, resetBoard, resetPlayerMoves };
     }
     
     function GameLogic() {
@@ -44,20 +42,27 @@ const globalWrapper = (() => {
         const player1Symbol = 'X';
         const player2Symbol = 'O';
 
-        //Function that adds player symbol to gameBoard obj based on player move
+        //Function that adds player symbol to game board obj based on player move
         const pushSymbol = (move) => {
             if (!isGameOver) {
                 const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
-                gameFlow.makeMove(move, currentSymbol);
+                makeMove(move, currentSymbol);
             }
         };
         //Function which will push user move to playerMoves obj
         const pushPlayerMoves = (move) => {
-            const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
-            if(!isGameOver && gameFlow.gameBoard[move] === '') {
+            const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
+            if(!isGameOver && gameFlow.getBoard()[move] === '') {
                 isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
                 currentPlayer.push(move);
                 moveCount++;
+            }
+        };
+
+        //Function to add user checked symbol to game board
+        const makeMove = (index, symbol) => {
+            if(gameFlow.getBoard()[index] === '') {
+                gameFlow.getBoard()[index] = symbol;
             }
         };
 
@@ -80,18 +85,18 @@ const globalWrapper = (() => {
         const checkForWinningCombination = (array, player) => {
             const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
             const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
-            console.log(gameFlow.playerMoves);
+            console.log(gameFlow.getPlayerMoves());
             if (winner) {
-                console.log(isPlayerOneMove ? `${player2Symbol} has won the game` : `${player1Symbol} has one the game`);
+                console.log(isPlayerOneMove ? `${gameControls.playerTwo.value} has won the game` : `${gameControls.playerOne.value} has won the game`);
                 isGameOver = true;
             }
         };
         
         //Handles move after game cell was clicked
         const handleMove = (move) => {
-            const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
+            const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
             pushPlayerMoves(move);
-            checkForWinningCombination(gameFlow.WINNABLE_CELLS, currentPlayer);  
+            checkForWinningCombination(gameFlow.getWinCells(), currentPlayer);  
             pushSymbol(move);
             declareDraw();          
         };
@@ -100,11 +105,9 @@ const globalWrapper = (() => {
             const currentSymbol = isPlayerOneMove ? player2Symbol : player1Symbol;
             return currentSymbol;
         }
-        const getGameStatus = () => {
-            return isGameOver;
-        }
+        const getGameStatus = () => isGameOver;
         
-        return { handleMove, restartGame, getPlayerSymbol, getGameStatus};
+        return { handleMove, restartGame, getPlayerSymbol, getGameStatus, makeMove};
     }
     
     function GameControls() {
@@ -112,7 +115,10 @@ const globalWrapper = (() => {
         const gameBoard = document.querySelector('[data-class="high-container"]');
         const cells = document.querySelectorAll('[data-class="cell"]');
 
-        //TODO: FIX BUG THAT ALLOWS ME TO INPUT MANY ELEMENTS IN SINGLE CELL
+
+        const playerOne = document.querySelector('[data-class="player-one"]');
+        const playerTwo = document.querySelector('[data-class="player-two"]');
+
         //TODO: FIX BUG THAT STOPS GAME BEFORE I INPUT LAST ELEMENT IN CELL
         const clearCells = () => {
             cells.forEach((cell) => {
@@ -126,7 +132,7 @@ const globalWrapper = (() => {
                 cell.addEventListener('click', () => {
                     gameLogic.handleMove(+cell.getAttribute('data-value'));
                     const gamePiece = document.createElement('span');
-                    if(gameLogic.getGameStatus() === false) {
+                    if(gameLogic.getGameStatus() === false && cell.innerHTML === '') {
                         gamePiece.innerHTML = `<span>${gameLogic.getPlayerSymbol()}</span>`;
                         cell.appendChild(gamePiece);
                         }
@@ -142,16 +148,17 @@ const globalWrapper = (() => {
                 clearCells();
             })
         };
+
         //starts game, adds user input name's to game screen
         const startGame = () => {
             startBtn.addEventListener('click', () => {
-            const inputOne = document.querySelector('[data-class="player-one"]');
-            const inputTwo = document.querySelector('[data-class="player-two"]');
     
-            startBtn.closest('.player-input-fields').style.display = 'none';
-            gameBoard.style.display = 'flex';
-            displayNames(`Player 1: ${inputOne.value} (X)`);
-            displayNames(`Player 2: ${inputTwo.value} (O)`);
+            if (playerOne.value !== '' || playerTwo.value !== '') {
+                startBtn.closest('.player-input-fields').style.display = 'none';
+                gameBoard.style.display = 'flex';
+                displayNames(`Player 1: ${playerOne.value} (X)`);
+                displayNames(`Player 2: ${playerTwo.value} (O)`);
+            }
             })
         };
 
@@ -168,7 +175,7 @@ const globalWrapper = (() => {
         startGame();
         playGame();
 
-        return {};
+        return {playerOne, playerTwo};
     }
     return {GameFlow, GameLogic, GameControls};
 })();
