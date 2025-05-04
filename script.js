@@ -100,10 +100,10 @@ const globalWrapper = (() => {
             declareDraw();          
         };
 
-        const getPlayerSymbol = () => isPlayerOneMove ? player1Symbol : player2Symbol;
+        const getPlayerStatus = () => isPlayerOneMove;
         const getGameStatus = () => isGameOver;
         
-        return { handleMove, restartGame, getPlayerSymbol, getGameStatus, makeMove};
+        return { handleMove, restartGame, getGameStatus, makeMove, getPlayerStatus};
     }
     
     function GameControls() {
@@ -121,17 +121,15 @@ const globalWrapper = (() => {
             //Makes action after cell on board is pressed
             cells.forEach((cell) => {
                 cell.addEventListener('click', () => {
+                    const currentSymbol = gameLogic.getPlayerStatus() ? 'X' : 'O';
                     gameLogic.handleMove(+cell.getAttribute('data-value'));
                     const gamePiece = document.createElement('span');
                     if(gameLogic.getGameStatus() === false && cell.innerHTML === '') {
-                        gamePiece.innerHTML = `<span>${gameLogic.getPlayerSymbol()}</span>`;
+                        gamePiece.innerHTML = `<span>${currentSymbol}</span>`;
                         cell.appendChild(gamePiece);
                         }
                     
                     })
-                cell.addEventListener('mouseover', () => {
-                    console.log(gameLogic.getPlayerSymbol());
-                })
                 })
             };
         
