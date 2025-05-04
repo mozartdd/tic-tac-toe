@@ -25,7 +25,6 @@ const globalWrapper = (() => {
         const makeMove = (index, symbol) => {
             if(gameBoard[index] === '') {
                 gameBoard[index] = symbol;
-                console.log(gameBoard);
             }
         };
     
@@ -36,11 +35,9 @@ const globalWrapper = (() => {
             }
         };
     
-        return { WINNABLE_CELLS, playerMoves, makeMove, resetBoard, resetPlayerMoves };
+        return { gameBoard, WINNABLE_CELLS, playerMoves, makeMove, resetBoard, resetPlayerMoves };
     }
     
-    //TODO:1) fix bug that after game is over engine is showing that game is won by opposite from winner player
-    //TODO:2) fix bug that i can push same values to player move obj
     function GameLogic() {
         let isPlayerOneMove = true;
         let isGameOver = false;
@@ -55,15 +52,14 @@ const globalWrapper = (() => {
                 const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
                 gameFlow.makeMove(move, currentSymbol);
                 isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
-                moveCount++;
-                console.log(moveCount);
             }
         };
         //Function which will push user move to playerMoves obj
         const pushPlayerMoves = (move) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
-            if(!isGameOver) {
-                currentPlayer.push(move);      
+            if(!isGameOver && gameFlow.gameBoard[move] === '') {
+                currentPlayer.push(move);
+                moveCount++;
             }
         };
         
@@ -93,17 +89,13 @@ const globalWrapper = (() => {
                 isGameOver = true;
             }
         };
-        //Declares winner
-        const declareWin = () => {
-
-        }
         
         const handleMove = (move) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.playerMoves.player1 : gameFlow.playerMoves.player2;
             pushPlayerMoves(move);
+            checkForWinningCombination(gameFlow.WINNABLE_CELLS, currentPlayer);  
             pushSymbol(move);
-            declareDraw();
-            checkForWinningCombination(gameFlow.WINNABLE_CELLS, currentPlayer);            
+            declareDraw();          
         }
         
         return { handleMove, restartGame};
