@@ -120,35 +120,40 @@ const globalWrapper = (() => {
             })
         }
 
-        //Makes action after cell on board is pressed
-        cells.forEach((cell) => {
-            cell.addEventListener('click', () => {
-                gameLogic.handleMove(+cell.getAttribute('data-value'));
-                const gamePiece = document.createElement('span');
-                if(gameLogic.getGameStatus() === false) {
-                    gamePiece.innerHTML = `<span>${gameLogic.getPlayerSymbol()}</span>`;
-                    cell.appendChild(gamePiece);
-                }
-            })
-        }); 
+        const playGame = () => {
+            //Makes action after cell on board is pressed
+            cells.forEach((cell) => {
+                cell.addEventListener('click', () => {
+                    gameLogic.handleMove(+cell.getAttribute('data-value'));
+                    const gamePiece = document.createElement('span');
+                    if(gameLogic.getGameStatus() === false) {
+                        gamePiece.innerHTML = `<span>${gameLogic.getPlayerSymbol()}</span>`;
+                        cell.appendChild(gamePiece);
+                        }
+                    })
+                })
+            };
         
         //resets game data
-        const resetBtn = document.querySelector('[data-class="restart-btn"]')
+        const gameRestart = () => {
+            const resetBtn = document.querySelector('[data-class="restart-btn"]')
             .addEventListener('click', () => {
                 gameLogic.restartGame();
                 clearCells();
-            });
-
+            })
+        };
         //starts game, adds user input name's to game screen
-        startBtn.addEventListener('click', () => {
+        const startGame = () => {
+            startBtn.addEventListener('click', () => {
             const inputOne = document.querySelector('[data-class="player-one"]');
             const inputTwo = document.querySelector('[data-class="player-two"]');
-
+    
             startBtn.closest('.player-input-fields').style.display = 'none';
             gameBoard.style.display = 'flex';
             displayNames(`Player 1: ${inputOne.value} (X)`);
             displayNames(`Player 2: ${inputTwo.value} (O)`);
-        })
+            })
+        };
 
         //Function to display player name's from input fields to screen
         const displayNames = (name) => {
@@ -157,9 +162,13 @@ const globalWrapper = (() => {
 
             nameFields.innerHTML = `<span>${name}</span>`;
             spanContainer.appendChild(nameFields);
-        }
+        };
 
-        return { };
+        gameRestart();
+        startGame();
+        playGame();
+
+        return {};
     }
     return {GameFlow, GameLogic, GameControls};
 })();
