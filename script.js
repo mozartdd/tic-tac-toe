@@ -39,23 +39,31 @@ const globalWrapper = (() => {
         let isGameOver = false;
         let moveCount = 0;
 
-        const player1Symbol = 'X';
-        const player2Symbol = 'O';
-
-        //Function that adds player symbol to game board obj based on player move
-        const pushSymbol = (move) => {
-            if (!isGameOver) {
-                const currentSymbol = isPlayerOneMove ? player1Symbol : player2Symbol;
-                makeMove(move, currentSymbol);
-            }
-        };
         //Function which will push user move to playerMoves obj
         const pushPlayerMoves = (move) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
             if(!isGameOver && gameFlow.getBoard()[move] === '') {
-                isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
                 currentPlayer.push(move);
                 moveCount++;
+            }
+        };
+
+        //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
+        const checkForWinningCombination = (array, player) => {
+            const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
+            console.log(gameFlow.getPlayerMoves());
+            if (winner) {
+                console.log(isPlayerOneMove ? `${gameControls.playerTwo.value} has won the game` : `${gameControls.playerOne.value} has won the game`);
+                isGameOver = true;
+            }
+        };
+
+        //Function that adds player symbol to game board obj based on player move
+        const pushSymbol = (move) => {
+            if (!isGameOver) {
+                const currentSymbol = isPlayerOneMove ? 'X' : 'O';
+                makeMove(move, currentSymbol);
+                isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
             }
         };
 
@@ -81,22 +89,15 @@ const globalWrapper = (() => {
             gameFlow.resetPlayerMoves()
             gameFlow.resetBoard();
         };
-        //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
-        const checkForWinningCombination = (array, player) => {
-            const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
-            console.log(gameFlow.getPlayerMoves());
-            if (winner) {
-                console.log(isPlayerOneMove ? `${gameControls.playerTwo.value} has won the game` : `${gameControls.playerOne.value} has won the game`);
-                isGameOver = true;
-            }
-        };
         
         //Handles move after game cell was clicked
         const handleMove = (move) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
             pushPlayerMoves(move);
-            checkForWinningCombination(gameFlow.getWinCells(), currentPlayer);  
             pushSymbol(move);
+            setTimeout(() => {
+                checkForWinningCombination(gameFlow.getWinCells(), currentPlayer);
+            }, 10);
             declareDraw();          
         };
 
@@ -114,8 +115,6 @@ const globalWrapper = (() => {
 
         const playerOne = document.querySelector('[data-class="player-one"]');
         const playerTwo = document.querySelector('[data-class="player-two"]');
-
-        //TODO: FIX BUG THAT STOPS GAME BEFORE I INPUT LAST ELEMENT IN CELL
 
         const playGame = () => {
             //Makes action after cell on board is pressed
