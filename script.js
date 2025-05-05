@@ -65,9 +65,9 @@ const globalWrapper = (() => {
         };
 
         // Checks for a draw (when all moves are taken)
-        const declareDraw = () => {
+        const declareDraw = (element) => {
             if (moveCount === 9 && !isGameOver) {
-                console.log('Game has ended with draw!');
+                element.innerHTML = `Game ended with draw`;
                 isGameOver = true;
             }
         };
@@ -81,19 +81,19 @@ const globalWrapper = (() => {
         };
         
         //Handles move after game cell was clicked
-        const handleMove = (move) => {
+        const handleMove = (move, user, element) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
             pushPlayerMoves(move, currentPlayer);
             pushSymbol(move);
-            declareWinner(currentPlayer);
-            declareDraw();
+            declareWinner(currentPlayer, user, element);
+            declareDraw(element);
         };
 
         //Declare a winner in UI
-        const declareWinner = (player) => {
+        const declareWinner = (player, user, element) => {
             const winner = checkForWinningCombination(gameFlow.getWinCells(), player); 
             if (winner) {
-                !isPlayerOneMove ? console.log(`player 1 won`) : console.log(`player 2 won`);
+                element.innerHTML = `${user} has Won!`;
                 isGameOver = true;
             }
         }
@@ -110,6 +110,7 @@ const globalWrapper = (() => {
         const cells = document.querySelectorAll('[data-class="cell"]');
         const playerOne = document.querySelector('[data-class="player-one"]');
         const playerTwo = document.querySelector('[data-class="player-two"]');
+        const winnerDiv = document.querySelector('[data-class="winner-announcement"]');
 
         // Handles the game flow when a cell is clicked
         const playGame = () => {
@@ -117,11 +118,12 @@ const globalWrapper = (() => {
                 cell.addEventListener('click', () => {
                     if(gameLogic.getGameStatus() === false && cell.dataset.played !== 'true') {
                         const currentSymbol = gameLogic.getPlayerStatus() ? 'X' : 'O';
+                        const currentPlayer = gameLogic.getPlayerStatus() ? playerOne.value : playerTwo.value;
                         const gamePiece = document.createElement('span');
                         gamePiece.innerHTML = `<span>${currentSymbol}</span>`;
                         cell.appendChild(gamePiece);
                         cell.dataset.played = 'true'; // Mark cell as played
-                        gameLogic.handleMove(+cell.getAttribute('data-value'));
+                        gameLogic.handleMove(+cell.getAttribute('data-value'), currentPlayer, winnerDiv);
                         }
                     })
                 })
@@ -157,6 +159,7 @@ const globalWrapper = (() => {
             resetBtn.addEventListener('click', () => {
                 gameLogic.restartGame();
                 clearCells();
+                winnerDiv.innerHTML = '';
             });
             playGame();
             hoverEffect();
