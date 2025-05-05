@@ -115,15 +115,40 @@ const globalWrapper = (() => {
         const playGame = () => {
             cells.forEach((cell) => {
                 cell.addEventListener('click', () => {
-                    const currentSymbol = gameLogic.getPlayerStatus() ? 'X' : 'O';
-                    const gamePiece = document.createElement('span');
-                    if(gameLogic.getGameStatus() === false && cell.innerHTML === '') {
-                        gameLogic.handleMove(+cell.getAttribute('data-value'));
+                    if(gameLogic.getGameStatus() === false && cell.dataset.played !== 'true') {
+                        const currentSymbol = gameLogic.getPlayerStatus() ? 'X' : 'O';
+                        const gamePiece = document.createElement('span');
                         gamePiece.innerHTML = `<span>${currentSymbol}</span>`;
                         cell.appendChild(gamePiece);
+                        cell.dataset.played = 'true'; // Mark cell as played
+                        gameLogic.handleMove(+cell.getAttribute('data-value'));
                         }
                     })
                 })
+            };
+
+            const hoverEffect = () => {
+                cells.forEach((cell) => {
+                    const hoverPiece = document.createElement('div');
+                    hoverPiece.classList.add('hover-piece');
+            
+                    cell.addEventListener('mouseover', () => {
+                        if (gameLogic.getGameStatus() === false && cell.dataset.played !== 'true') {
+                            hoverPiece.textContent = gameLogic.getPlayerStatus() ? 'X' : 'O';
+                            cell.appendChild(hoverPiece);
+                        }
+                    });
+            
+                    cell.addEventListener('mouseleave', () => {
+                        if (cell.contains(hoverPiece)) {
+                            cell.removeChild(hoverPiece);
+                        }
+                    });
+
+                    cell.addEventListener('click', () => {
+                        hoverPiece.innerHTML = '';
+                    })
+                });
             };
 
         // Handles restarting the game
@@ -133,12 +158,15 @@ const globalWrapper = (() => {
                 gameLogic.restartGame();
                 clearCells();
             });
+            playGame();
+            hoverEffect();
         };
 
         // Clears all the cells (removes symbols)
         const clearCells = () => {
             cells.forEach((cell) => {
                 cell.innerHTML = '';
+                cell.dataset.played = 'false'; // Reset custom state
             });
         };
 
@@ -164,7 +192,6 @@ const globalWrapper = (() => {
 
         gameRestart();
         startGame();
-        playGame();
 
         return { playerOne, playerTwo };
     }

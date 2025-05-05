@@ -49,9 +49,14 @@ body {
     cursor: pointer;
 }
 
-.cell:hover {
-    background-color: rgb(17, 17, 17);
+.hover-piece {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 7rem;
 }
+
+
 .cell:first-of-type {
     border-left: none;
     border-top: none;
