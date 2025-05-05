@@ -2,34 +2,29 @@ const globalWrapper = (() => {
     function GameFlow() {
         //Board to hold cells/fields selected by user's
         const gameBoard = Array(9).fill('');
-        const getBoard = () => gameBoard; 
     
         const WINNABLE_CELLS = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], //rows
             [0, 3, 6], [1, 4, 7], [2, 5, 8], //columns
             [0, 4, 8], [2, 4, 6] //diagonal
         ];
-        const getWinCells = () => WINNABLE_CELLS;
 
         //Obj that hold information of player chosen cells inside of an arrays
         const playerMoves = {
             player1: [],
             player2: []
         };
-        const getPlayerMoves = () => playerMoves;
 
         //resets player moves array's
         const resetPlayerMoves = () => {
             playerMoves.player1 = [];
             playerMoves.player2 = [];
         };
-    
-        //Function that resets board to initial state
-        const resetBoard = () => {
-            for (let i = 0; i < gameBoard.length; i++) {
-                gameBoard[i] = '';
-            }
-        };
+
+        const getBoard = () => gameBoard;
+        const getPlayerMoves = () => playerMoves;
+        const resetBoard = () => gameBoard.fill('');
+        const getWinCells = () => WINNABLE_CELLS;
     
         return { getBoard, getWinCells, getPlayerMoves, resetBoard, resetPlayerMoves };
     }
@@ -39,49 +34,44 @@ const globalWrapper = (() => {
         let isGameOver = false;
         let moveCount = 0;
 
-        //Function which will push user move to playerMoves obj
-        const pushPlayerMoves = (move) => {
-            const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
+        // Function to push user move to playerMoves object
+        const pushPlayerMoves = (move, player) => {
             if(!isGameOver && gameFlow.getBoard()[move] === '') {
-                currentPlayer.push(move);
+                player.push(move);
                 moveCount++;
+                isPlayerOneMove = !isPlayerOneMove;
             }
         };
 
-        //Function that loops trough all winnable combinations and for each cell compares that all indices is included in player moves
+        // Checks for a winning combination based on player moves
         const checkForWinningCombination = (array, player) => {
-            const winner =  array.some((cells) => cells.every((cell) => player.includes(cell)));
-            console.log(gameFlow.getPlayerMoves());
-            if (winner) {
-                console.log(isPlayerOneMove ? `${gameControls.playerTwo.value} has won the game` : `${gameControls.playerOne.value} has won the game`);
-                isGameOver = true;
-            }
+            return array.some((cells) => cells.every((cell) => player.includes(cell)));
+
         };
 
-        //Function that adds player symbol to game board obj based on player move
+        // Adds the player symbol to the game board based on the move
         const pushSymbol = (move) => {
             if (!isGameOver) {
                 const currentSymbol = isPlayerOneMove ? 'X' : 'O';
                 makeMove(move, currentSymbol);
-                isPlayerOneMove = !isPlayerOneMove;  // Toggles the turn
             }
         };
 
-        //Function to add user checked symbol to game board
+        // Places the symbol on the board at the specified index
         const makeMove = (index, symbol) => {
             if(gameFlow.getBoard()[index] === '') {
                 gameFlow.getBoard()[index] = symbol;
             }
         };
 
-        //Function to stop game if it is draw
+        // Checks for a draw (when all moves are taken)
         const declareDraw = () => {
-            if (moveCount === 9) {
-                isGameOver = true;
+            if (moveCount === 9 && !isGameOver) {
                 console.log('Game has ended with draw!');
+                isGameOver = true;
             }
         };
-
+        // Resets the game state
         const restartGame = () => {
             isPlayerOneMove = true;
             isGameOver = false;
@@ -93,77 +83,81 @@ const globalWrapper = (() => {
         //Handles move after game cell was clicked
         const handleMove = (move) => {
             const currentPlayer = isPlayerOneMove ? gameFlow.getPlayerMoves().player1 : gameFlow.getPlayerMoves().player2;
-            pushPlayerMoves(move);
+            pushPlayerMoves(move, currentPlayer);
             pushSymbol(move);
-            setTimeout(() => {
-                checkForWinningCombination(gameFlow.getWinCells(), currentPlayer);
-            }, 10);
-            declareDraw();          
+            declareWinner(currentPlayer);
+            declareDraw();
         };
+
+        //Declare a winner in UI
+        const declareWinner = (player) => {
+            const winner = checkForWinningCombination(gameFlow.getWinCells(), player); 
+            if (winner) {
+                !isPlayerOneMove ? console.log(`player 1 won`) : console.log(`player 2 won`);
+                isGameOver = true;
+            }
+        }
 
         const getPlayerStatus = () => isPlayerOneMove;
         const getGameStatus = () => isGameOver;
         
-        return { handleMove, restartGame, getGameStatus, makeMove, getPlayerStatus};
+        return { handleMove, restartGame, getGameStatus, getPlayerStatus};
     }
     
     function GameControls() {
         const startBtn = document.querySelector('[data-class="start-btn"]');
         const gameBoard = document.querySelector('[data-class="high-container"]');
         const cells = document.querySelectorAll('[data-class="cell"]');
-
-
         const playerOne = document.querySelector('[data-class="player-one"]');
         const playerTwo = document.querySelector('[data-class="player-two"]');
 
+        // Handles the game flow when a cell is clicked
         const playGame = () => {
-            //Makes action after cell on board is pressed
             cells.forEach((cell) => {
                 cell.addEventListener('click', () => {
                     const currentSymbol = gameLogic.getPlayerStatus() ? 'X' : 'O';
-                    gameLogic.handleMove(+cell.getAttribute('data-value'));
                     const gamePiece = document.createElement('span');
                     if(gameLogic.getGameStatus() === false && cell.innerHTML === '') {
+                        gameLogic.handleMove(+cell.getAttribute('data-value'));
                         gamePiece.innerHTML = `<span>${currentSymbol}</span>`;
                         cell.appendChild(gamePiece);
                         }
-                    
                     })
                 })
             };
-        
-        //resets game data
+
+        // Handles restarting the game
         const gameRestart = () => {
-            const resetBtn = document.querySelector('[data-class="restart-btn"]')
-            .addEventListener('click', () => {
+            const resetBtn = document.querySelector('[data-class="restart-btn"]');
+            resetBtn.addEventListener('click', () => {
                 gameLogic.restartGame();
                 clearCells();
-            })
+            });
         };
+
+        // Clears all the cells (removes symbols)
         const clearCells = () => {
             cells.forEach((cell) => {
-                cell.innerHTML = ``;
-            })
-        }
+                cell.innerHTML = '';
+            });
+        };
 
         //starts game, adds user input name's to game screen
         const startGame = () => {
             startBtn.addEventListener('click', () => {
-    
-            if (playerOne.value !== '' && playerTwo.value !== '') {
-                startBtn.closest('.player-input-fields').style.display = 'none';
-                gameBoard.style.display = 'flex';
-                displayNames(`Player 1: ${playerOne.value} (X)`);
-                displayNames(`Player 2: ${playerTwo.value} (O)`);
-            }
+                if (playerOne.value !== '' && playerTwo.value !== '') {
+                    startBtn.closest('.player-input-fields').style.display = 'none';
+                    gameBoard.style.display = 'flex';
+                    displayNames(`Player 1: ${playerOne.value} (X)`);
+                    displayNames(`Player 2: ${playerTwo.value} (O)`);
+                }
             })
         };
 
-        //Function to display player name's from input fields to screen
+        // Displays player names on the screen
         const displayNames = (name) => {
             const nameFields = document.createElement('span');
             const spanContainer = document.querySelector('[data-class="span-container"]');
-
             nameFields.innerHTML = `<span>${name}</span>`;
             spanContainer.appendChild(nameFields);
         };
@@ -172,11 +166,12 @@ const globalWrapper = (() => {
         startGame();
         playGame();
 
-        return {playerOne, playerTwo};
+        return { playerOne, playerTwo };
     }
     return {GameFlow, GameLogic, GameControls};
 })();
 
+// Instantiate the game
 const gameFlow = globalWrapper.GameFlow();
 const gameLogic = globalWrapper.GameLogic();
 const gameControls = globalWrapper.GameControls();
