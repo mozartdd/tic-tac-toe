@@ -67,7 +67,7 @@ const globalWrapper = (() => {
         // Checks for a draw (when all moves are taken)
         const declareDraw = (element) => {
             if (moveCount === 9 && !isGameOver) {
-                element.innerHTML = `Game ended with draw`;
+                element.textContent = `Game ended with draw`;
                 isGameOver = true;
             }
         };
@@ -93,7 +93,7 @@ const globalWrapper = (() => {
         const declareWinner = (player, user, element) => {
             const winner = checkForWinningCombination(gameFlow.getWinCells(), player); 
             if (winner) {
-                element.innerHTML = `${user} has Won!`;
+                element.textContent = `${user} has Won!`;
                 isGameOver = true;
             }
         }
