@@ -2,7 +2,7 @@
 Overview
 A simple Tic Tac Toe game built as part of the Odin Project curriculum. The game allows two players to play against each other on the same device.
 
-![Screenshot From 2025-05-20 13-46-36](https://github.com/user-attachments/assets/f2308293-57d4-4138-80a3-d3580076de77)
+![Screenshot From 2025-06-03 11-20-13](https://github.com/user-attachments/assets/85c6894e-5634-491c-910a-0453eb398b74)
 
 ## Features
 - Two-player gameplay on a 3x3 grid
@@ -20,7 +20,8 @@ A simple Tic Tac Toe game built as part of the Odin Project curriculum. The game
 ## Usage
 Players take turns clicking the grid to place their marks (X or O). The game automatically detects wins or draws and allows restarting.
 
-## Project Status
+## Project Status!
+
 Will add option to play agains AI in future.
 
 ## Credits
